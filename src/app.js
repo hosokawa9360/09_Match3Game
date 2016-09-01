@@ -6,6 +6,12 @@ var gameScene = cc.Scene.extend({
     this.addChild(gameLayer);
   }
 });
+var fieldSize = 6;
+var tileTypes = ["orange", "cyan", "greeen", "yellow", "purple"];
+var tileSize = 50;
+var orbLayer;
+var tileArray = [];
+var cache;
 
 var game = cc.Layer.extend({
   init: function() {
@@ -18,29 +24,33 @@ var game = cc.Layer.extend({
     size = cc.winSize;
     debugText.setPosition(size.width / 2, size.height - 20);
     debugText.setString("match 3 game");
+    //オーブを配置するレイヤー
+    orbLayer = cc.Layer.create();
+    this.addChild(orbLayer);
 
     //スプライトシート読み込み
-    var cache = cc.spriteFrameCache;
+    cache = cc.spriteFrameCache;
     cache.addSpriteFrames(res.orbs_plist, res.orbs_png);
-    var tileTypes = ["orange", "cyan", "greeen", "yellow", "purple"];
-    for (i = 0; i < 5; i++) {
-      for (j = 0; j < 6; j++) {
-        //ランダム
-        var randomTile = Math.floor(Math.random() * tileTypes.length);
-        var sprite = cc.Sprite.create(cache.getSpriteFrame(tileTypes[randomTile]));
-        sprite.setPosition(115 + 49 * j, 50 + 49 * i);
-        this.addChild(sprite, 0);
+
+    this.createLevel();
+  },
+  createLevel: function() {
+    for (i = 0; i < fieldSize; i++) {
+      tileArray[i] = [];
+      for (j = 0; j < fieldSize; j++) {
+        this.addTile(i, j);
       }
     }
-
-    　
-
-    /*
-    var cache2 = cc.spriteFrameCache;
-     cache2.addSpriteFrames(res.orb_plist,res.orbs_png);
-     var orbSprite = cc.Sprite.create(cache2.getSpriteFrame("green"));
-      orbSprite.setPosition(100,100);
-    　this.addChild(orbSprite);*/
   },
+
+  addTile: function(row, col) {
+    var randomTile = Math.floor(Math.random() * tileTypes.length);
+    var sprite = cc.Sprite.create(cache.getSpriteFrame(tileTypes[randomTile]));
+    orbLayer.addChild(sprite, 0);
+    sprite.val = randomTile;
+    orbLayer.addChild(sprite,0);
+    sprite.setPosition(tileSize/2 + tileSize * col,tileSize/2 + tileSize * row);
+    tileArray[row][col]=sprite;
+  }
 
 });
