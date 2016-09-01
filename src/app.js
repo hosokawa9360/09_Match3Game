@@ -25,7 +25,9 @@ var game = cc.Layer.extend({
     var tileTypes = ["orange", "cyan", "greeen", "yellow", "purple"];
     for (i = 0; i < 5; i++) {
       for (j = 0; j < 6; j++) {
-        var sprite = cc.Sprite.create(cache.getSpriteFrame(tileTypes[i]));
+        //ランダム
+        var randomTile = Math.floor(Math.random() * tileTypes.length);
+        var sprite = cc.Sprite.create(cache.getSpriteFrame(tileTypes[randomTile]));
         sprite.setPosition(115 + 49 * j, 50 + 49 * i);
         this.addChild(sprite, 0);
       }
