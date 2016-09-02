@@ -1,4 +1,5 @@
 ## 09_Match3Game
+たくさんのオーブを水平、垂直、または斜めにつなげていき、消去するゲーム。
 
 #### １．格子状にオーブを配置する
 
@@ -39,16 +40,17 @@ addTile: function(row, col) {
 ```
 
 #### ４．最初のコマを選択または解除する
+グローバル変数
 ```
 //最初のコマを選択または解除で追加
 var startColor = null;　 //最初に選択したタイルの色
 var visitedTiles = []; //プレイヤが選択された後のタイルを格納する
 ```
-
+イベントマネージャ
 ```
 cc.eventManager.addListener(touchListener, this);
 ```
-
+リスナー実装
 ```
 var touchListener = cc.EventListener.create({
       event: cc.EventListener.MOUSE, //マウスを利用する
@@ -74,4 +76,20 @@ var touchListener = cc.EventListener.create({
       }
 });
 
+```
+#### ５．連鎖チェーンを作る
+ゲームのルールはシンプル。
+たくさんのコマを水平、垂直、または斜めにつなげていき、消去するゲーム。
+バックトラックもできる。
+
+- 選択許容範囲内にある
+- 現在のコマがまだ選択されておらず、picked属性がfalseである
+- 現在のコマは最後の選択されあたコマに隣接している
+- 現在のコマは、まず選んだコマと同じ色である
+
+##### 選択許容範囲内にあるの判定について
+ポイント　指とタイルの距離判定にはピタゴラスの定理をつかう　tolerance 400 : 20 * 20  
+これにより、なぞり方が多少不正確でも、思ったとおりにコマを選択できる
+```
+if (distX * distX + distY * distY < tolerance) {
 ```
