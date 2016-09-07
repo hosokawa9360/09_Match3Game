@@ -1,9 +1,9 @@
 ## 09_Match3Game
-たくさんのオーブを水平、垂直、または斜めにつなげていき、消去するゲーム。
+たくさんのコマを水平、垂直、または斜めにつなげていき、消去するゲーム。
 
-#### １．格子状にオーブを配置する
+#### １．格子状にコマを配置する
 
-#### ２．ランダムにオーブを配置する
+#### ２．ランダムにコマを配置する
 
 #### ３．先を見越して　配置するメソッドを実装する
 グローバル変数
@@ -133,4 +133,30 @@ onMouseMove: function(event){
                }
        }
    },
+```
+
+### コマを消す
+コマを連続選択できたら、マウスを離したときにそれらを消去します。
+条件
+- 連鎖しているコマの数は３つ以上
+処理
+ 配置するコマを管理している配列 tileArray から　 連鎖するコマの座標を管理するvisitedTiles に登録されている連鎖するコマ（の行と列）を削除する
+ ```
+ onMouseUp: function(event) {
+   startColor = null; //プレイヤがマウスを話したとき、コマの選択をnull(リセットする）
+   for (i = 0; i < visitedTiles.length; i++) {
+    //連鎖しているコマの数が３未満なら、消さずに初期状態にもどす
+     if (visitedTiles.length < 3) {
+       tileArray[visitedTiles[i].row][visitedTiles[i].col].setOpacity(255);
+       tileArray[visitedTiles[i].row][visitedTiles[i].col].picked = false;
+     } else {
+      // 連鎖しているコマの数は３つ以上
+       globezLayer.removeChild(tileArray[visitedTiles[i].row][visitedTiles[i].col]);
+       //消去する
+       tileArray[visitedTiles[i].row][visitedTiles[i].col] = null;
+     }
+   }
+   //連鎖を管理する配列を初期化
+   visitedTiles = [];
+ },
 ```
