@@ -112,6 +112,18 @@ var touchListener = cc.EventListener.create({
             }
           }
         }
+          //条件２　現在のコマは、すでに選択状態にあり、picked属性はtrueとなっている
+          else{
+            //条件３　現在のコマは、visidedTiled配列の最後から2版目要素である
+              if(visitedTiles.length>=2 && currentRow == visitedTiles[visitedTiles.length - 2].row && currentCol == visitedTiles[visitedTiles.length - 2].col){
+                //透明度も255に戻される。
+                  tileArray[visitedTiles[visitedTiles.length - 1].row][visitedTiles[visitedTiles.length - 1].col].setOpacity(255);
+                  //picked属性はデフォルト値であるfalse,
+                  tileArray[visitedTiles[visitedTiles.length - 1].row][visitedTiles[visitedTiles.length - 1].col].picked=false;
+                  //最後に選択移動したコマの情報を連鎖チェーンから削除
+                  visitedTiles.pop();
+              }
+          }
       }
     }
   }

@@ -93,3 +93,44 @@ var touchListener = cc.EventListener.create({
 ```
 if (distX * distX + distY * distY < tolerance) {
 ```
+
+#### ６．バックトラッキング
+一度選択したルートをキャンセルし、変更したい場合、後戻りして、途中で選択を変更し、別ルートを取ることをバックトラッキングという。  
+今回は、プレイヤーが最後に選択移動したコマの一つ前にコマにマウスで戻ることをバックトラッキングとする。  
+そのとき、一つ前に戻るわけだから、最後に選択移動したコマの情報（最後のコマのvisitedTiles配列とpicked属性、および透明度）が削除される。それぞれ、picked属性はデフォルト値であるfalse,透明度も255に戻される。  
+
+バックトラックを行うことができるかは、チェックが必要。  
+- 条件１　選択許容範囲内にある
+- 条件２　現在のコマは、すでに選択状態にあり、picked属性はtrueとなっている
+- 現在のコマは、visidedTiled配列の最後から2版目要素である
+
+上記の条件等々を`onMouseMove`　にコーディングすると、
+```
+onMouseMove: function(event){
+       if(startColor!=null){
+           //省略
+           //ピタゴラスの定理で　選択許容範囲内かどうかを判定
+           //条件１　選択許容範囲内にある
+           if(distX * distX + distY * distY < tolerance){
+             //現在のコマがまだ選択されておらず、picked属性がfalseである
+               if(!tileArray[currentRow][currentCol].picked){
+　　　　　　　　　　　//省略 連鎖チェーンを作る処理
+               }
+               //条件２　現在のコマは、すでに選択状態にあり、picked属性はtrueとなっている
+               else{
+                 //条件３　現在のコマは、visidedTiled配列の最後から2版目要素である
+                   if(visitedTiles.length>=2 && currentRow == visitedTiles[visitedTiles.length - 2].row && currentCol == visitedTiles[visitedTiles.length - 2].col){
+
+                     //透明度も255に戻される。  
+                       tileArray[visitedTiles[visitedTiles.length - 1].row][visitedTiles[visitedTiles.length - 1].col].setOpacity(255);
+
+                       //picked属性はデフォルト値であるfalse,
+                       tileArray[visitedTiles[visitedTiles.length - 1].row][visitedTiles[visitedTiles.length - 1].col].picked=false;
+
+                       //最後に選択移動したコマの情報を連鎖チェーンから削除
+                       visitedTiles.pop();
+                   }
+               }
+       }
+   },
+```
