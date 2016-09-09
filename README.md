@@ -135,7 +135,7 @@ onMouseMove: function(event){
    },
 ```
 
-### コマを消す
+### ７．コマを消す
 コマを連続選択できたら、マウスを離したときにそれらを消去します。
 条件
 - 連鎖しているコマの数は３つ以上
@@ -151,7 +151,7 @@ onMouseMove: function(event){
        tileArray[visitedTiles[i].row][visitedTiles[i].col].picked = false;
      } else {
       // 連鎖しているコマの数は３つ以上
-       globezLayer.removeChild(tileArray[visitedTiles[i].row][visitedTiles[i].col]);
+       orbLayer.removeChild(tileArray[visitedTiles[i].row][visitedTiles[i].col]);
        //消去する
        tileArray[visitedTiles[i].row][visitedTiles[i].col] = null;
      }
@@ -160,3 +160,64 @@ onMouseMove: function(event){
    visitedTiles = [];
  },
 ```
+
+### ８．コマが落ちるようにする
+連鎖したコマを削除できたら、連鎖したコマの削除した空きスペースに、消されていないコマが落ちるようにする必要があります。
+
+onMouseUpにかなり多くの変更を加えます。
+
+3つ以上のコマを連鎖させたか？
+```
+if (visitedTiles.length >= 3) {
+  ```
+
+//0行目ではなく１行目（最下行の一つ上）から、fieldSize-1まですべての行のループ
+  ```
+for (i = 1; i < fieldSize; i++) {
+  ```
+
+//指定された行の列を１つずつチェックする  
+```
+    for (j = 0; j < fieldSize; j++) {
+      ```
+//i,jで指定された場所にコマがあったら
+      ```
+      if (tileArray[i][j] != null) {
+        ```
+        //holesBelow変数は、コマの下の空きスペースの数をカウントする
+        ```
+        var holesBelow = 0;
+        ```
+        //現在の行から1行目に向かって、下がっていく
+        ```
+        for (var k = i - 1; k >= 0; k--) {
+          ```
+          //空きスペースのとき、tileArrayはnullなので、holesBelow変数を加算する
+          ```
+            if (tileArray[k][j] == null) {
+            holesBelow++;
+            }
+            ```
+
+        //holesBelow > 0　であれば、穴があったとわかる
+        ```
+        if (holesBelow > 0) {
+            ```
+            //穴の数に応じて、コマを移動（落下）させる
+              ```
+          var moveAction = cc.MoveTo.create(0.5, new cc.Point(tileArray[i][j].x, tileArray[i][j].y - holesBelow * tileSize));
+          // cc,moveTo() can also be used
+          tileArray[i][j].runAction(moveAction);
+          ```
+          //最後にコマの新しい位置をtileArrayに書き込んで、落ちた場所のコマを消去
+          ```
+          tileArray[i - holesBelow][j] = tileArray[i][j];
+          tileArray[i][j] = null;
+          ```
+
+        }
+      }
+    }
+  }
+}
+visitedTiles = [];

@@ -80,12 +80,41 @@ var touchListener = cc.EventListener.create({
   onMouseUp: function(event) {
     startColor = null; //プレイヤがマウスを話したとき、コマの選択をnull(リセットする）
     for (i = 0; i < visitedTiles.length; i++) {
+      //連鎖しているコマの数が３未満なら、消さずに初期状態にもどす
       if (visitedTiles.length < 3) {
         tileArray[visitedTiles[i].row][visitedTiles[i].col].setOpacity(255);
         tileArray[visitedTiles[i].row][visitedTiles[i].col].picked = false;
       } else {
+        //連鎖しているコマの数は３つ以上
         orbLayer.removeChild(tileArray[visitedTiles[i].row][visitedTiles[i].col]);
+        //消去する
         tileArray[visitedTiles[i].row][visitedTiles[i].col] = null;
+      }
+    }
+    //消去されたあと、空いているマスにコマを落す処理　
+    //連鎖しているコマが3つ以上あった場合
+    if (visitedTiles.length >= 3) {
+      //コマが消去されている行、列を探す
+      //列
+      for (i = 1; i < fieldSize; i++) {
+//行
+        for (j = 0; j < fieldSize; j++) {
+          if (tileArray[i][j] != null) {
+            var holesBelow = 0;
+            for (var k = i - 1; k >= 0; k--) {
+              if (tileArray[k][j] == null) {
+                holesBelow++;
+              }
+            }
+            if (holesBelow > 0) {
+              var moveAction = cc.MoveTo.create(0.5, new cc.Point(tileArray[i][j].x, tileArray[i][j].y - holesBelow * tileSize));
+              // cc,moveTo() can also be used
+              tileArray[i][j].runAction(moveAction);
+              tileArray[i - holesBelow][j] = tileArray[i][j];
+              tileArray[i][j] = null;
+            }
+          }
+        }
       }
     }
     visitedTiles = [];
