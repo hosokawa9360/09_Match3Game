@@ -221,3 +221,49 @@ for (i = 1; i < fieldSize; i++) {
   }
 }
 visitedTiles = [];
+
+### ９．新しいコマを生成し、空いた場所を埋める
+落下するコマを作ると同じやり方で、空いた場所を数えます。この数は生成するコマの数になります。スムーズに落下するように見せるため、生成したコマはステージ外の上の正しい位置に配置後、アニメーショントゥイーンで移動させます。
+  ```
+//消去されたあと、空いているマスにコマを落す処理　
+//連鎖しているコマが3つ以上あった場合
+if (visitedTiles.length >= 3) {
+  //コマが消去されている行、列を探す
+  //列
+  for (i = 1; i < fieldSize; i++) {
+    //行
+    for (j = 0; j < fieldSize; j++) {
+      if (tileArray[i][j] != null) {
+      　//省略
+      }
+    }
+  }
+  ```
+  //ここから、新しいコマを生成し、空いた場所を埋める処理
+  ```
+  for (i = 0; i < fieldSize; i++) {
+    //ｊは行　ある列の最上行から下方向に検索
+    for (j = fieldSize - 1; j >= 0; j--) {  
+      //コマがあったら、break jが fieldSize - 1 より少なければ空白ありの証拠
+      if (tileArray[j][i] != null) {
+        break; //jはその列の残っているコマの数
+      }
+    }
+    //１列に配置できるコマの最大値-その列に残っているコマの数は空白の数
+    //つまりはその列に落さなければならないコマの数
+    var missingGlobes = fieldSize - 1 - j;
+    if (missingGlobes > 0) {
+      //落さなければならないコマの数だけ、コマを生成し落すfallTile関数を実行する
+      for (j = 0; j < missingGlobes; j++) {
+        this.fallTile(fieldSize - j - 1, i, missingGlobes - j)
+      }
+    }
+  }
+    ```
+    ここまで
+      ```
+}
+visitedTiles = [];
+},
+  ```
+  this.fallTile関数の内容はコードを見て理解してください。

@@ -97,7 +97,7 @@ var touchListener = cc.EventListener.create({
       //コマが消去されている行、列を探す
       //列
       for (i = 1; i < fieldSize; i++) {
-//行
+        //行
         for (j = 0; j < fieldSize; j++) {
           if (tileArray[i][j] != null) {
             var holesBelow = 0;
@@ -116,6 +116,28 @@ var touchListener = cc.EventListener.create({
           }
         }
       }
+      //新しいコマを生成し、空いた場所を埋める処理
+      for (i = 0; i < fieldSize; i++) {
+        //ｊは行　ある列の最上行から下方向に検索
+        for (j = fieldSize - 1; j >= 0; j--) {
+          //コマがあったら、break jが fieldSize - 1 より少なければ空白ありの証拠
+          if (tileArray[j][i] != null) {
+            break; //jはその列の残っているコマの数
+          }
+        }
+        //１列に配置できるコマの最大値-その列に残っているコマの数は空白の数
+        //つまりはその列に落さなければならないコマの数
+        var missingGlobes = fieldSize - 1 - j;
+        console.log(missingGlobes);
+        if (missingGlobes > 0) {
+          //落さなければならないコマの数だけ、コマを生成し落すfallTile関数を実行する
+          for (j = 0; j < missingGlobes; j++) {
+            //目標の行、目標の列、落下時の高さを引数として与える
+            this.fallTile(fieldSize - j - 1, i, missingGlobes - j)
+          }
+        }
+      }
+
     }
     visitedTiles = [];
   },
@@ -161,5 +183,19 @@ var touchListener = cc.EventListener.create({
         }
       }
     }
-  }
+  },
+  //コマを生成し落す関数 fallTile　  引数：目標の行、目標の列、落下時の高さ
+  fallTile:function(row,col,height){
+         var randomTile = Math.floor(Math.random()*tileTypes.length);
+         var spriteFrame = cc.spriteFrameCache.getSpriteFrame(tileTypes[randomTile]);
+         var sprite = cc.Sprite.createWithSpriteFrame(spriteFrame);
+         sprite.val = randomTile;
+         sprite.picked = false;
+         orbLayer.addChild(sprite,0);
+         sprite.setPosition(col*tileSize+tileSize/2,(fieldSize+height)*tileSize);
+         var moveAction = cc.MoveTo.create(0.5, new cc.Point(col*tileSize+tileSize/2,row*tileSize+tileSize/2));
+         sprite.runAction(moveAction);
+         tileArray[row][col] = sprite;
+     },
+
 });
