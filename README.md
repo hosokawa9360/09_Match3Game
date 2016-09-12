@@ -214,14 +214,14 @@ for (i = 1; i < fieldSize; i++) {
           tileArray[i - holesBelow][j] = tileArray[i][j];
           tileArray[i][j] = null;
           ```
-
+```
         }
       }
     }
   }
 }
 visitedTiles = [];
-
+```
 ### ９．新しいコマを生成し、空いた場所を埋める
 落下するコマを作ると同じやり方で、空いた場所を数えます。この数は生成するコマの数になります。スムーズに落下するように見せるため、生成したコマはステージ外の上の正しい位置に配置後、アニメーショントゥイーンで移動させます。
   ```
@@ -267,3 +267,42 @@ visitedTiles = [];
 },
   ```
   this.fallTile関数の内容はコードを見て理解してください。
+
+### １０．マウスが描くパスを描画する
+最後に、プレイヤーがなぞったところに線を描画し、視覚的なフィードバックを提供して、ゲームを完成させます。  
+
+外部変数へ追加  
+```
+//マウスが描くパスを描画で追加
+var arrowsLayer;
+```
+`this.addChild(orbLayer);`の次に追加
+```
+//マウスでなぞった線を配置するレイヤ
+arrowsLayer = cc.DrawNode.create();
+this.addChild(arrowsLayer);
+```
+マウスを離したときにclearメソッドを利用し、描画領域をクリアする  
+```
+onMouseUp: function(event) {
+  arrowsLayer.clear();//描画領域をクリア
+```
+`onMouseMove: function(event)`で実装
+```
+if (distX * distX + distY * distY < tolerance) {
+//変更しない
+・・・・
+this.drawPath();
+```
+fallTile:functionの次に追加する
+```
+//マウスがなぞったところに線を表示する
+drawPath:function(){
+    arrowsLayer.clear();
+    if(visitedTiles.length>0){
+        for(var i=1;i<visitedTiles.length;i++){
+            arrowsLayer.drawSegment(new cc.Point(visitedTiles[i-1].col*tileSize+tileSize/2,visitedTiles[i-1].row*tileSize+tileSize/2),new cc.Point(visitedTiles[i].col*tileSize+tileSize/2,visitedTiles[i].row*tileSize+tileSize/2), 4,cc.color(255, 255, 255, 255));
+        }
+    }
+}
+```

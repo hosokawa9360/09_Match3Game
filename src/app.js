@@ -17,6 +17,8 @@ var startColor = null;　 //最初に選択したタイルの色
 var visitedTiles = []; //プレイヤが選択された後のタイルを格納する
 //連鎖チェーンを作るで追加
 var tolerance = 400; //タイルの中心からの距離の許容値　選択許容範囲
+//マウスが描くパスを描画で追加
+var arrowsLayer;
 
 var game = cc.Layer.extend({
   init: function() {
@@ -32,6 +34,10 @@ var game = cc.Layer.extend({
     //オーブを配置するレイヤー
     orbLayer = cc.Layer.create();
     this.addChild(orbLayer);
+    //マウスでなぞった線を配置するレイヤ
+		arrowsLayer = cc.DrawNode.create();
+		this.addChild(arrowsLayer);
+
 
     //スプライトシート読み込み
     cache = cc.spriteFrameCache;
@@ -78,6 +84,8 @@ var touchListener = cc.EventListener.create({
     });
   },
   onMouseUp: function(event) {
+		arrowsLayer.clear();//描画領域をクリア
+
     startColor = null; //プレイヤがマウスを話したとき、コマの選択をnull(リセットする）
     for (i = 0; i < visitedTiles.length; i++) {
       //連鎖しているコマの数が３未満なら、消さずに初期状態にもどす
@@ -168,6 +176,9 @@ var touchListener = cc.EventListener.create({
               });
             }
           }
+					//線を描く
+					console.log("線を描く");
+					this.drawPath();
         }
         //条件２　現在のコマは、すでに選択状態にあり、picked属性はtrueとなっている
         else {
@@ -186,6 +197,7 @@ var touchListener = cc.EventListener.create({
   },
   //コマを生成し落す関数 fallTile　  引数：目標の行、目標の列、落下時の高さ
   fallTile:function(row,col,height){
+    //タイルの色の表す番号
          var randomTile = Math.floor(Math.random()*tileTypes.length);
          var spriteFrame = cc.spriteFrameCache.getSpriteFrame(tileTypes[randomTile]);
          var sprite = cc.Sprite.createWithSpriteFrame(spriteFrame);
@@ -197,5 +209,14 @@ var touchListener = cc.EventListener.create({
          sprite.runAction(moveAction);
          tileArray[row][col] = sprite;
      },
+		 //マウスがなぞったところに線を表示する
+    drawPath:function(){
+        arrowsLayer.clear();
+        if(visitedTiles.length>0){
+            for(var i=1;i<visitedTiles.length;i++){
+                arrowsLayer.drawSegment(new cc.Point(visitedTiles[i-1].col*tileSize+tileSize/2,visitedTiles[i-1].row*tileSize+tileSize/2),new cc.Point(visitedTiles[i].col*tileSize+tileSize/2,visitedTiles[i].row*tileSize+tileSize/2), 4,cc.color(255, 255, 255, 255));
+            }
+        }
+    }
 
 });
